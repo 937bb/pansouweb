@@ -110,7 +110,7 @@ export const search = async (params: SearchParams): Promise<SearchResponse> => {
   // 添加ext参数，包含referer信息
   const searchParams = {
     ...params,
-    ext: JSON.stringify({ referer: "https://dm.xueximeng.com" })
+    // ext: JSON.stringify({ referer: "https://dm.xueximeng.com" })
   };
   
   // console.log('搜索参数:', searchParams);
