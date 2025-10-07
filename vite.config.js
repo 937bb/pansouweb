@@ -1,3 +1,11 @@
+/*
+ * @Descripttion: 
+ * @version: 
+ * @Author: 937bb
+ * @Date: 2025-10-06 22:34:16
+ * @LastEditors: 937bb
+ * @LastEditTime: 2025-10-07 23:29:14
+ */
 import { fileURLToPath, URL } from 'node:url'
 import { defineConfig, loadEnv } from 'vite'
 import vue from '@vitejs/plugin-vue'
@@ -6,7 +14,6 @@ import vue from '@vitejs/plugin-vue'
 export default defineConfig(({ mode }) => {
   // 加载环境变量
   const env = loadEnv(mode, process.cwd(), '')
-  
   return {
     plugins: [
       vue({
