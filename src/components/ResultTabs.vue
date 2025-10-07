@@ -8,6 +8,7 @@ const props = defineProps<{
 	loading: boolean;
 	hasSearched: boolean;
 	isActivelySearching: boolean;
+	keyword: string;
 }>();
 
 // 当前激活的标签
@@ -23,7 +24,7 @@ const currentPage = ref(1);
 
 // 计算所有可用的网盘类型
 const diskTypes = computed(() => {
-	return Object.keys(props.mergedResults || {}).sort();
+	return Object.keys(props.mergedResults || {});
 });
 
 // 判断是否有搜索结果
@@ -169,10 +170,17 @@ const formatDateTime = (dateTimeStr?: string) => {
 		return dateTimeStr;
 	}
 };
-
+const displayKey = (key: string) => key.replace(/^disk_/, "");
 // 获取网盘类型中文名称
 const getDiskName = (type: string) => {
-	return getDiskTypeName(type);
+	return getDiskTypeName(displayKey(type));
+};
+
+const highlightKeyword = (text) => {
+	if (!props.keyword) return text;
+	// 使用正则高亮匹配部分（不区分大小写）
+	const pattern = new RegExp(`(${props.keyword})`, "gi");
+	return text.replace(pattern, '<span class="highlight">$1</span>');
 };
 </script>
 
@@ -229,25 +237,27 @@ const getDiskName = (type: string) => {
 				</div>
 
 				<div v-else class="result-list" @scroll="handleScroll">
-					<div v-for="(item, index) in visibleItems" :key="index" class="result-item">
-						<img class="result-image" v-if="item.images && item.images.length" :src="item.images[0]" alt="" />
-						<div>
-							<div class="result-title" :title="item.note">{{ item.note }}</div>
+					<div v-for="(item, index) in visibleItems" :key="index" class="">
+						<span class="result-item" @click="openLink(item.url)">
+							<img class="result-image" v-if="item.images && item.images.length" :src="item.images[0]" alt="" />
+							<div>
+								<div class="result-title" :title="item.note" v-html="highlightKeyword(item.note)"></div>
 
-							<div class="result-meta" v-if="item.source || item.datetime">
-								<span v-if="item.source" class="result-source">{{ item.source }}</span>
-								<span v-if="item.source && item.datetime" class="meta-separator">·</span>
-								<span v-if="item.datetime" class="result-date">{{ formatDateTime(item.datetime) }}</span>
-							</div>
-
-							<!-- 第二行：链接和提取码 -->
-							<div class="result-row">
-								<span class="result-link" @click="openLink(item.url)">点击打开网盘</span>
-								<div v-if="item.password" class="result-password" @click="copyPassword(item.password, $event)">
-									提取码: <span class="password-value">{{ item.password }}</span>
+								<div class="result-meta" v-if="item.source || item.datetime">
+									<!-- <span v-if="item.source" class="result-source">{{ item.source }}</span> -->
+									<!-- <span v-if="item.source && item.datetime" class="meta-separator">·</span> -->
+									<span v-if="item.datetime" class="result-date">{{ formatDateTime(item.datetime) }}</span>
 								</div>
-							</div>
-						</div>
+
+								<!-- 第二行：链接和提取码 -->
+								<div class="result-row">
+									<span class="result-link" @click="openLink(item.url)">点击打开网盘</span>
+									<div v-if="item.password" class="result-password" @click="copyPassword(item.password, $event)">
+										提取码: <span class="password-value">{{ item.password }}</span>
+									</div>
+								</div>
+							</div></span
+						>
 					</div>
 
 					<div v-if="visibleItems.length < currentTabData.length" class="loading-more">
@@ -628,7 +638,13 @@ const getDiskName = (type: string) => {
 
 	.tab-button {
 		padding: 0.5rem 0.75rem;
-		font-size: 0.75rem;
+		font-size: 0.9rem;
 	}
+}
+
+::v-deep(.highlight) {
+	color: #ff4d4f; /* 红色高亮 */
+	font-weight: bold;
+	background-color: #fff3f3;
 }
 </style>

@@ -56,7 +56,7 @@ const switchToDocs = () => {
 const handleSearch = async (params: SearchParams) => {
 	// 停止之前的更新
 	stopUpdate();
-
+	keyword.value = params.kw;
 	// 标记已执行搜索和正在搜索
 	hasSearched.value = true;
 	isActivelySearching.value = true;
@@ -174,17 +174,44 @@ const handleSearchComplete = () => {
 };
 
 // 更新搜索结果
+const diskSortOrder = ["aliyun", "baidu", "quark", "115", "123", "xunlei", "mobile", "tianyi", "uc", "pikpak", "ed2k", "magnet", "other"];
+
 const updateSearchResults = (response: SearchResponse) => {
 	if (!response) return;
 
 	searchResults.total = response.total || 0;
 
-	if (response.merged_by_type) {
-		searchResults.mergedResults = { ...response.merged_by_type };
-	} else {
-		console.warn("搜索结果中没有merged_by_type字段");
+	if (!response.merged_by_type) {
+		console.warn("搜索结果中没有 merged_by_type 字段");
 		searchResults.mergedResults = {};
+		return;
 	}
+
+	const merged = response.merged_by_type;
+
+	// 临时给整数键加前缀
+	const normalizeKey = (key: string) => (/^\d+$/.test(key) ? `disk_${key}` : key);
+	const denormalizeKey = (key: string) => key.replace(/^disk_/, "");
+
+	// 1️⃣ 转数组并加前缀
+	const entries: [string, any][] = Object.entries(merged).map(([k, v]) => [normalizeKey(k), v]);
+
+	// 2️⃣ 按自定义顺序排序
+	entries.sort(([aKey], [bKey]) => {
+		const aIdx = diskSortOrder.indexOf(denormalizeKey(aKey));
+		const bIdx = diskSortOrder.indexOf(denormalizeKey(bKey));
+		const aPos = aIdx === -1 ? 999 : aIdx;
+		const bPos = bIdx === -1 ? 999 : bIdx;
+		return aPos - bPos;
+	});
+
+	// 3️⃣ 转回对象，并保留前缀顺序
+	const sortedMerged = entries.reduce((acc, [k, v]) => {
+		acc[k] = v;
+		return acc;
+	}, {} as Record<string, any>);
+	// 4️⃣ 赋值给响应式对象
+	searchResults.mergedResults = sortedMerged;
 };
 
 // 开始第二次ALL源搜索
@@ -362,6 +389,7 @@ const getRouteParams = () => {
 	return params;
 };
 const searchForm = ref(null);
+const keyword = ref("");
 onMounted(() => {
 	checkAuth();
 	window.addEventListener("auth:required", handleAuthRequired);
@@ -461,6 +489,7 @@ onUnmounted(() => {
 						:loading="loading"
 						:hasSearched="hasSearched"
 						:isActivelySearching="isActivelySearching"
+						:keyword="keyword"
 					/>
 				</div>
 			</div>
@@ -483,7 +512,7 @@ onUnmounted(() => {
 					<span>© {{ new Date().getFullYear() }}-{{ new Date().getFullYear() + 10 }}</span>
 					<span>Powered by PanSou</span>
 				</div>
-				<br>
+				<br />
 				<div class="flex items-center justify-center gap-4 text-sm text-muted-foreground">
 					<span><a href="https://www.937tv.vip" target="_blank">937影视 - 全网视频免VIP</a></span>
 				</div>
