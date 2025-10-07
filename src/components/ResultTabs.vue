@@ -242,7 +242,9 @@ const getDiskName = (type: string) => {
 
 							<!-- 第二行：链接和提取码 -->
 							<div class="result-row">
-								<div class="result-link" @click="openLink(item.url)">{{ item.url }}</div>
+								<div class="result-link" @click="openLink(item.url)">
+                  <a :href="item.url">点击跳转</a>
+                </div>
 								<div v-if="item.password" class="result-password" @click="copyPassword(item.password, $event)">
 									提取码: <span class="password-value">{{ item.password }}</span>
 								</div>
@@ -518,7 +520,9 @@ const getDiskName = (type: string) => {
 	font-size: 0.875rem;
 	color: #3b82f6;
 	overflow: hidden;
+  display: flex;
   flex-wrap: wrap;
+
 	text-overflow: ellipsis;
 	/* white-space: nowrap; */
 	cursor: pointer;
