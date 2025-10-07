@@ -232,7 +232,7 @@ const getDiskName = (type: string) => {
 					<div v-for="(item, index) in visibleItems" :key="index" class="result-item">
 						<img class="result-image" v-if="item.images && item.images.length" :src="item.images[0]" alt="" />
 						<div>
-								<div class="result-title" :title="item.note">{{ item.note }}</div>
+							<div class="result-title" :title="item.note">{{ item.note }}</div>
 
 							<div class="result-meta" v-if="item.source || item.datetime">
 								<span v-if="item.source" class="result-source">{{ item.source }}</span>
@@ -242,9 +242,7 @@ const getDiskName = (type: string) => {
 
 							<!-- 第二行：链接和提取码 -->
 							<div class="result-row">
-								<div class="result-link" @click="openLink(item.url)">
-                  <a :href="item.url">点击跳转</a>
-                </div>
+								<span class="result-link" @click="openLink(item.url)">点击打开网盘</span>
 								<div v-if="item.password" class="result-password" @click="copyPassword(item.password, $event)">
 									提取码: <span class="password-value">{{ item.password }}</span>
 								</div>
@@ -404,7 +402,7 @@ const getDiskName = (type: string) => {
 	padding: 0.75rem;
 	border-bottom: 1px solid #f3f4f6;
 	transition: background-color 0.2s ease;
-  display: flex;
+	display: flex;
 }
 
 .result-item:hover {
@@ -414,9 +412,11 @@ const getDiskName = (type: string) => {
 .result-row {
 	display: flex;
 	justify-content: space-between;
-  flex-wrap: wrap;
-	align-items: center;
+	flex-wrap: wrap;
 	margin-bottom: 0.5rem;
+	align-items: center;
+	margin-top: 2.3rem;
+	/* flex-direction: column; */
 }
 
 .result-row:last-child {
@@ -425,8 +425,8 @@ const getDiskName = (type: string) => {
 
 .result-image {
 	max-width: 100px;
-  border-radius: 5px;
-  margin-right: 12px;
+	border-radius: 5px;
+	margin-right: 12px;
 }
 
 .result-title {
@@ -435,10 +435,10 @@ const getDiskName = (type: string) => {
 	color: #111827;
 	overflow: hidden;
 	text-overflow: ellipsis;
-  /* 三行 */
-  display: -webkit-box;
-  -webkit-box-orient: vertical;
-  -webkit-line-clamp: 3;
+	/* 三行 */
+	display: -webkit-box;
+	-webkit-box-orient: vertical;
+	-webkit-line-clamp: 3;
 	/* white-space: nowrap; */
 	/* flex: 1; */
 }
@@ -520,13 +520,17 @@ const getDiskName = (type: string) => {
 	font-size: 0.875rem;
 	color: #3b82f6;
 	overflow: hidden;
-  display: flex;
-  flex-wrap: wrap;
-
+	display: flex;
+	flex-wrap: wrap;
+	color: #3b82f6;
+	font-weight: 500;
+	background-color: #eff6ff;
+	padding: 0.125rem 0.375rem;
+	border-radius: 0.25rem;
+	border: 1px solid #bfdbfe;
 	text-overflow: ellipsis;
 	/* white-space: nowrap; */
 	cursor: pointer;
-	flex: 1;
 }
 
 .result-link:hover {
@@ -536,10 +540,9 @@ const getDiskName = (type: string) => {
 .result-password {
 	font-size: 0.75rem;
 	color: #6b7280;
-	margin-left: 0.75rem;
-
 	cursor: pointer;
 	transition: all 0.2s ease;
+	margin-left: 0.5rem;
 }
 
 .result-password:hover {
