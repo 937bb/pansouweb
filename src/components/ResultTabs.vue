@@ -237,8 +237,7 @@ const highlightKeyword = (text) => {
 				</div>
 
 				<div v-else class="result-list" @scroll="handleScroll">
-					<div v-for="(item, index) in visibleItems" :key="index" class="">
-						<span class="result-item" @click="openLink(item.url)">
+					<div v-for="(item, index) in visibleItems" :key="index" class="result-item"  @click="openLink(item.url)">
 							<img class="result-image" v-if="item.images && item.images.length" :src="item.images[0]" alt="" />
 							<div>
 								<div class="result-title" :title="item.note" v-html="highlightKeyword(item.note)"></div>
@@ -256,8 +255,7 @@ const highlightKeyword = (text) => {
 										提取码: <span class="password-value">{{ item.password }}</span>
 									</div>
 								</div>
-							</div></span
-						>
+							</div>
 					</div>
 
 					<div v-if="visibleItems.length < currentTabData.length" class="loading-more">
